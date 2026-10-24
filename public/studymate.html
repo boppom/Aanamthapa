@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000" id="metaTheme">
+<title>StudyMate — School & Tuition Planner</title>
+
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('sm_theme') || 'dark';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    var l = localStorage.getItem('sm_lang');
+    if (!l) l = (navigator.language || 'en').toLowerCase().indexOf('ne') === 0 ? 'ne' : 'en';
+    document.documentElement.setAttribute('data-lang', l);
+    document.documentElement.setAttribute('lang', l === 'ne' ? 'ne' : 'en');
+  } catch (e) {}
+})();
+</script>
+
+<style>
+:root{
+  --bg:#000000; --bg-soft:#050507; --card:#0b0b10; --card-2:#101017;
+  --ink:#f4f5fa; --muted:#8a90a8; --line:#1c1c26; --soft:#15151d;
+  --primary:#8b8bff; --primary-bg:#5f5fe0; --primary-soft:#1a1a2e;
+  --solid:#f4f5fa; --solid-ink:#000000;
+  --toast-bg:#f4f5fa; --toast-ink:#000000;
+  --school-bg:#0f1e38;  --school-fg:#7fb0f5;
+  --tuition-bg:#2a1f0c; --tuition-fg:#f0b95e;
+  --high-bg:#2c1418;    --high-fg:#f08a8a;
+  --medium-bg:#2a2210;  --medium-fg:#e8bf6a;
+  --low-bg:#0f261f;     --low-fg:#5fd6ab;
+  --danger-bg:#2c1418;  --danger-fg:#f08a8a;
+  --hero1:#4a2fd8; --hero2:#7b3fe4; --hero3:#b84fe0; --hero4:#2f6bff;
+  --timer-bg:#1c1c26;
+  --streak-1:#ff8a3d; --streak-2:#ff4d8d;
+  --shadow:0 1px 2px rgba(0,0,0,.6), 0 10px 28px rgba(0,0,0,.55);
+  --hero-shadow:0 20px 60px rgba(110,60,220,.4), 0 0 0 1px rgba(160,120,255,.14) inset;
+  color-scheme: dark;
+}
+
+html:not([data-theme="dark"]){
+  --bg:#f2f4f9; --bg-soft:#eef0f7; --card:#ffffff; --card-2:#ffffff;
+  --ink:#151a2d; --muted:#7a8199; --line:#e6e9f2; --soft:#eef0f7;
+  --primary:#5b5bd6; --primary-bg:#5b5bd6; --primary-soft:#ececfd;
+  --solid:#151a2d; --solid-ink:#ffffff;
+  --toast-bg:#151a2d; --toast-ink:#ffffff;
+  --school-bg:#e8f1fe;  --school-fg:#2a6fd6;
+  --tuition-bg:#fef3e0; --tuition-fg:#b7750a;
+  --high-bg:#fdeaea;    --high-fg:#c93434;
+  --medium-bg:#fff4e0;  --medium-fg:#a9720a;
+  --low-bg:#e8f6f0;     --low-fg:#0b7a5b;
+  --danger-bg:#fdeaea;  --danger-fg:#ef4444;
+  --hero1:#5b5bd6; --hero2:#7c5cf0; --hero3:#a06bf5; --hero4:#4f8bff;
+  --timer-bg:#e6e9f2;
+  --streak-1:#f59e0b; --streak-2:#ef4444;
+  --shadow:0 1px 2px rgba(20,25,45,.04), 0 8px 24px rgba(20,25,45,.06);
+  --hero-shadow:0 14px 34px rgba(91,91,214,.28);
+  color-scheme: light;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",
+    "Noto Sans Devanagari","Mukta",Arial,sans-serif;
+  background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+  padding-bottom:40px; font-size:15px; line-height:1.45;
+  transition:background .4s ease, color .4s ease; overflow-x:hidden;
+}
+.app{max-width:840px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
+.hidden{display:none !important}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:18px 0 10px;position:sticky;top:0;background:var(--bg);z-index:30;
+}
+.topbar h1{font-size:20px;letter-spacing:-.02em;font-weight:800}
+.topbar h1 span{
+  background:linear-gradient(90deg,var(--primary),var(--hero3),var(--primary));
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:gradText 5s linear infinite;
+}
+@keyframes gradText{to{background-position:200% 0}}
+.topbar p{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px}
+.top-actions{display:flex;gap:8px;flex-shrink:0}
+
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+  background:var(--card);color:var(--muted);font-size:17px;cursor:pointer;
+  display:grid;place-items:center;transition:.2s;
+}
+.icon-btn:hover{color:var(--primary);border-color:var(--primary)}
+
+.tabs{
+  display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;position:sticky;top:66px;
+  background:var(--bg);z-index:29;scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  white-space:nowrap;border:1px solid var(--line);background:var(--card);
+  padding:9px 16px;border-radius:999px;font:inherit;font-size:13.5px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:.2s;
+}
+.tab.active{background:var(--solid);color:var(--solid-ink);border-color:var(--solid)}
+
+.card{
+  background:var(--card);border-radius:16px;padding:16px;
+  border:1px solid var(--line);box-shadow:var(--shadow);
+}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:14px;box-shadow:var(--shadow);
+  display:flex;gap:12px;align-items:flex-start;position:relative;overflow:hidden;
+}
+.item::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--stripe,transparent);
+}
+.item-body{flex:1;min-width:0}
+.item-title{font-weight:650;font-size:14.5px;letter-spacing:-.01em;word-break:break-word}
+.item-sub{font-size:12.5px;color:var(--muted);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+
+.empty{
+  text-align:center;padding:30px 16px;color:var(--muted);font-size:13.5px;
+  background:var(--card);border-radius:14px;border:1px dashed var(--line);
+}
+.empty b{display:block;font-size:26px;margin-bottom:6px;opacity:.55}
+
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}
+.sec-head h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.pill{
+  font-size:11.5px;font-weight:700;background:var(--card);color:var(--muted);
+  padding:3px 9px;border-radius:999px;border:1px solid var(--line);
+}
+
+.tag{
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:var(--primary-soft);color:var(--primary);white-space:nowrap;
+}
+.tag.school {background:var(--school-bg); color:var(--school-fg)}
+.tag.tuition{background:var(--tuition-bg);color:var(--tuition-fg)}
+.tag.high    {background:var(--high-bg);   color:var(--high-fg)}
+.tag.medium  {background:var(--medium-bg); color:var(--medium-fg)}
+.tag.low     {background:var(--low-bg);    color:var(--low-fg)}
+.tag.done    {background:var(--low-bg);    color:var(--low-fg)}
+.tag.late    {background:var(--high-bg);   color:var(--high-fg)}
+
+.card.hero{
+  position:relative;overflow:hidden;color:#fff;padding:26px 22px 22px;
+  border-radius:22px;border:1px solid rgba(160,120,255,.18);
+  background:linear-gradient(125deg, var(--hero1), var(--hero2) 30%, var(--hero3) 55%, var(--hero4) 80%, var(--hero1));
+  background-size:400% 400%;
+  animation:heroShift 18s ease-in-out infinite;
+  box-shadow:var(--hero-shadow);
+}
+@keyframes heroShift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.hero-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-greet{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.hero-sub{font-size:13px;opacity:.9;margin-top:4px}
+.streak-badge{
+  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  padding:5px 12px;border-radius:999px;background:rgba(255,138,61,.28);
+  border:1px solid rgba(255,180,120,.4);font-size:12px;font-weight:800;color:#fff;
+}
+.stats{display:flex;gap:10px;margin-top:20px}
+.stat{
+  flex:1;min-width:0;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:11px 10px;
+}
+.stat b{display:block;font-size:20px;font-weight:800;line-height:1.2}
+.stat span{font-size:10px;opacity:.9;font-weight:700;letter-spacing:.05em}
+
+.ring{width:66px;height:66px;flex-shrink:0;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+.ring .bg{stroke:rgba(255,255,255,.2)}
+.ring .fg{stroke:#fff;transition:stroke-dashoffset 1s ease}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
+input,select,textarea{
+  font:inherit;color:var(--ink);background:var(--card-2);border:1px solid var(--line);
+  border-radius:12px;padding:11px 13px;width:100%;outline:none;
+}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{
+  font:inherit;font-weight:650;border:1px solid transparent;border-radius:12px;padding:12px 18px;
+  cursor:pointer;background:var(--soft);color:var(--ink);transition:.2s;
+}
+.btn.primary{background:linear-gradient(135deg,var(--primary-bg),#8b5cf6);color:#fff}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+.btn.block{width:100%}
+.btn-row{display:flex;gap:10px}
+
+.check{
+  width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex-shrink:0;
+  cursor:pointer;display:grid;place-items:center;background:var(--card-2);
+}
+.check.on{background:#10b981;border-color:#10b981}
+.check.on::after{
+  content:"";width:6px;height:11px;border:2px solid #fff;border-top:0;border-left:0;
+  transform:rotate(42deg) translate(-1px,-1px);
+}
+.item.done .item-title{text-decoration:line-through;color:var(--muted)}
+.del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+
+.day-pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.day-pill{
+  flex:0 0 auto;min-width:56px;padding:9px 10px;border-radius:13px;border:1px solid var(--line);
+  background:var(--card);font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;
+}
+.day-pill.active{background:linear-gradient(135deg,var(--primary-bg),#8b5cf6);color:#fff;border-color:transparent}
+
+.chips{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
+.chip{
+  border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;
+  font:inherit;font-size:12.5px;font-weight:650;color:var(--muted);cursor:pointer;white-space:nowrap;
+}
+.chip.active{background:var(--solid);border-color:var(--solid);color:var(--solid-ink)}
+
+.exam-count{
+  text-align:center;flex-shrink:0;min-width:58px;border-radius:12px;padding:7px 4px;
+  background:var(--primary-soft);color:var(--primary);font-weight:800;
+}
+.exam-count b{display:block;font-size:18px}
+.exam-count span{font-size:9.5px;text-transform:uppercase}
+.exam-count.soon{background:var(--high-bg);color:var(--high-fg)}
+
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.note{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;
+  cursor:pointer;min-height:120px;display:flex;flex-direction:column;
+}
+.note h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.note p{font-size:12.5px;color:var(--muted);line-height:1.5;flex:1;overflow:hidden;white-space:pre-wrap}
+.note.add{background:transparent;border:1.5px dashed var(--line);align-items:center;justify-content:center}
+
+.focus-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 0}
+.timer{position:relative;width:220px;height:220px;margin:8px 0}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:10;stroke-linecap:round}
+.timer .bg{stroke:var(--timer-bg)}
+.timer .fg{stroke:var(--primary);transition:stroke-dashoffset .4s linear}
+.timer-inner{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.timer-time{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums}
+.timer-mode{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
+.modes{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center}
+.mode{
+  border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;
+  font:inherit;font-size:12.5px;font-weight:650;color:var(--muted);cursor:pointer;
+}
+.mode.active{background:var(--primary-bg);border-color:var(--primary-bg);color:#fff}
+
+.toast{
+  position:fixed;left:50%;bottom:26px;background:var(--toast-bg);color:var(--toast-ink);
+  padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:200;
+  transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:.25s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div>
+      <h1>Study<span>Mate</span></h1>
+      <p id="topDate"></p>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="langBtn" type="button" aria-label="Language">EN</button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme">🌓</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" type="button" data-tab="today">Today</button>
+    <button class="tab" type="button" data-tab="timetable">Timetable</button>
+    <button class="tab" type="button" data-tab="tasks">Homework</button>
+    <button class="tab" type="button" data-tab="exams">Exams</button>
+    <button class="tab" type="button" data-tab="notes">Notes</button>
+    <button class="tab" type="button" data-tab="focus">Focus</button>
+  </nav>
+
+  <main>
+    <section class="view" id="view-today">
+      <div class="card hero" id="heroCard">
+        <div class="hero-row">
+          <div>
+            <div class="hero-greet" id="greet">Good day 👋</div>
+            <div class="hero-sub" id="heroSub">Loading today...</div>
+            <div class="streak-badge" id="streakBadge">
+              <span>🔥</span> <span id="streakNum">1</span> <span>day streak</span>
+            </div>
+          </div>
+          <svg class="ring" viewBox="0 0 100 100">
+            <circle class="bg" cx="50" cy="50" r="42"></circle>
+            <circle class="fg" cx="50" cy="50" r="42" id="ringFg" stroke-dasharray="263.9" stroke-dashoffset="263.9"></circle>
+          </svg>
+        </div>
+        <div class="stats" id="stats">
+          <div class="stat"><b id="stClasses">0</b><span>CLASSES</span></div>
+          <div class="stat"><b id="stDue">0</b><span>DUE TODAY</span></div>
+          <div class="stat"><b id="stOverdue">0</b><span>OVERDUE</span></div>
+          <div class="stat"><b id="stExam">—</b><span>DAYS TO EXAM</span></div>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <h2>Today's schedule</h2>
+        <span class="pill" id="todayCount">0</span>
+      </div>
+      <div class="list" id="todayClasses"></div>
+
+      <div class="sec-head"><h2>Due soon</h2></div>
+      <div class="list" id="todayTasks"></div>
+    </section>
+
+    <section class="view hidden" id="view-timetable">
+      <div class="day-pills" id="dayPills"></div>
+      <div class="list" id="ttList"></div>
+      <div style="margin-top:14px">
+        <button class="btn primary block" type="button" id="toggleClassForm">+ Add a class</button>
+        <form class="card hidden" id="classForm" style="margin-top:10px">
+          <div class="field">
+            <label for="cSubject">Subject</label>
+            <input id="cSubject" placeholder="e.g. Mathematics">
+          </div>
+          <div class="row2">
+            <div class="field"><label for="cStart">Starts</label><input id="cStart" type="time" value="08:00"></div>
+            <div class="field"><label for="cEnd">Ends</label><input id="cEnd" type="time" value="08:45"></div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="cType">Type</label>
+              <select id="cType">
+                <option value="school">🏫 School</option>
+                <option value="tuition">📚 Tuition</option>
+              </select>
+            </div>
+            <div class="field"><label for="cPlace">Room / Teacher</label><input id="cPlace" placeholder="Room 12"></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn primary" style="flex:1">Save class</button>
+            <button type="button" class="btn ghost" id="cancelClassForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view hidden" id="view-tasks">
+      <div class="chips" id="taskChips">
+        <button class="chip active" type="button" data-filter="pending">Pending</button>
+        <button class="chip" type="button" data-filter="today">Due today</button>
+        <button class="chip" type="button" data-filter="overdue">Overdue</button>
+        <button class="chip" type="button" data-filter="done">Completed</button>
+        <button class="chip" type="button" data-filter="all">All</button>
+      </div>
+      <div class="list" id="taskList"></div>
+      <div style="margin-top:14px">
+        <button class="btn primary block" type="button" id="toggleTaskForm">+ Add homework</button>
+        <form class="card hidden" id="taskForm" style="margin-top:10px">
+          <div class="field"><label for="tTitle">Task</label><input id="tTitle" placeholder="e.g. Algebra worksheet"></div>
+          <div class="row2">
+            <div class="field"><label for="tSubject">Subject</label><input id="tSubject" placeholder="Mathematics"></div>
+            <div class="field"><label for="tDue">Due date</label><input id="tDue" type="date"></div>
+          </div>
+          <div class="field">
+            <label for="tPriority">Priority</label>
+            <select id="tPriority">
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn primary" style="flex:1">Add task</button>
+            <button type="button" class="btn ghost" id="cancelTaskForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view hidden" id="view-exams">
+      <div class="list" id="examList"></div>
+      <div style="margin-top:14px">
+        <button class="btn primary block" type="button" id="toggleExamForm">+ Add exam</button>
+        <form class="card hidden" id="examForm" style="margin-top:10px">
+          <div class="field"><label for="eSubject">Subject</label><input id="eSubject" placeholder="Physics"></div>
+          <div class="row2">
+            <div class="field"><label for="eDate">Date</label><input id="eDate" type="date"></div>
+            <div class="field"><label for="eTime">Time</label><input id="eTime" type="time" value="09:00"></div>
+          </div>
+          <div class="field">
+            <label for="eType">Type</label>
+            <select id="eType">
+              <option value="school">🏫 School exam</option>
+              <option value="tuition">📚 Tuition test</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn primary" style="flex:1">Add exam</button>
+            <button type="button" class="btn ghost" id="cancelExamForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view hidden" id="view-notes">
+      <div class="notes-grid" id="notesGrid"></div>
+    </section>
+
+    <section class="view hidden" id="view-focus">
+      <div class="card focus-wrap">
+        <div class="timer">
+          <svg viewBox="0 0 200 200">
+            <circle class="bg" cx="100" cy="100" r="88"></circle>
+            <circle class="fg" cx="100" cy="100" r="88" id="timerRing" stroke-dasharray="552.9" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="timer-inner">
+            <div class="timer-time" id="timerTime">25:00</div>
+            <div class="timer-mode">Focus Mode</div>
+          </div>
+        </div>
+        <div class="modes">
+          <button class="mode active" data-min="25">Focus 25</button>
+          <button class="mode" data-min="5">Break 5</button>
+          <button class="mode" data-min="15">Long 15</button>
+        </div>
+        <div class="btn-row" style="width:240px">
+          <button class="btn primary" id="timerStart" style="flex:2">Start</button>
+          <button class="btn" id="timerReset" style="flex:1">Reset</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  const S_KEY = 'sm_data_store_v1';
+  let data = JSON.parse(localStorage.getItem(S_KEY) || '{}');
+  if (!data.classes) {
+    data = {
+      classes: [
+        { id: '1', day: 0, subject: 'Mathematics', start: '08:00', end: '08:45', type: 'school', place: 'Room 12' },
+        { id: '2', day: 0, subject: 'Physics', start: '17:00', end: '18:30', type: 'tuition', place: 'Mr. Rao' },
+        { id: '3', day: 1, subject: 'Chemistry', start: '09:00', end: '09:45', type: 'school', place: 'Lab 2' }
+      ],
+      tasks: [
+        { id: '1', title: 'Algebra worksheet Q1–Q10', subject: 'Mathematics', due: new Date().toISOString().split('T')[0], priority: 'high', done: false },
+        { id: '2', title: 'Read Chapter 4 English summary', subject: 'English', due: new Date(Date.now() + 86400000).toISOString().split('T')[0], priority: 'medium', done: false }
+      ],
+      exams: [
+        { id: '1', subject: 'Mathematics', date: new Date(Date.now() + 6*86400000).toISOString().split('T')[0], time: '09:00', type: 'school' }
+      ],
+      notes: [
+        { id: '1', title: 'Quadratic Formula', body: 'x = (-b ± √(b² - 4ac)) / 2a' }
+      ],
+      streak: 3
+    };
+    localStorage.setItem(S_KEY, JSON.stringify(data));
+  }
+
+  function save() { localStorage.setItem(S_KEY, JSON.stringify(data)); }
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let curDay = (new Date().getDay() + 6) % 7;
+
+  // Day pills
+  const dp = document.getElementById('dayPills');
+  dp.innerHTML = days.map((d, i) => `<button class="day-pill ${i===curDay?'active':''}" data-d="${i}">${d}</button>`).join('');
+  dp.onclick = (e) => {
+    if (e.target.dataset.d !== undefined) {
+      curDay = Number(e.target.dataset.d);
+      document.querySelectorAll('.day-pill').forEach(b => b.classList.toggle('active', Number(b.dataset.d) === curDay));
+      renderTimetable();
+    }
+  };
+
+  function renderToday() {
+    const todayIndex = (new Date().getDay() + 6) % 7;
+    const todayCls = data.classes.filter(c => c.day === todayIndex);
+    document.getElementById('stClasses').textContent = todayCls.length;
+    document.getElementById('todayCount').textContent = todayCls.length;
+
+    const pending = data.tasks.filter(t => !t.done);
+    document.getElementById('stDue').textContent = pending.length;
+    document.getElementById('heroSub').textContent = `${todayCls.length} classes scheduled today · ${pending.length} tasks pending`;
+
+    const nextEx = data.exams[0];
+    if (nextEx) {
+      const diff = Math.ceil((new Date(nextEx.date) - new Date()) / 86400000);
+      document.getElementById('stExam').textContent = diff > 0 ? diff : '0';
+    }
+
+    document.getElementById('todayClasses').innerHTML = todayCls.length ? todayCls.map(c => `
+      <div class="item">
+        <div style="min-width:60px"><b>${c.start}</b><br><small class="muted">${c.end}</small></div>
+        <div class="item-body">
+          <div class="item-title">${c.subject}</div>
+          <div class="item-sub"><span class="tag ${c.type}">${c.type}</span> ${c.place ? '<span>' + c.place + '</span>' : ''}</div>
+        </div>
+      </div>
+    `).join('') : '<div class="empty"><b>🎉</b>No classes scheduled today!</div>';
+
+    document.getElementById('todayTasks').innerHTML = pending.length ? pending.map(t => `
+      <div class="item">
+        <div class="check ${t.done?'on':''}" onclick="toggleTask('${t.id}')"></div>
+        <div class="item-body">
+          <div class="item-title">${t.title}</div>
+          <div class="item-sub"><span class="tag ${t.priority}">${t.priority}</span><span>${t.due}</span></div>
+        </div>
+      </div>
+    `).join('') : '<div class="empty"><b>✅</b>All caught up on homework!</div>';
+  }
+
+  function renderTimetable() {
+    const list = data.classes.filter(c => c.day === curDay);
+    document.getElementById('ttList').innerHTML = list.length ? list.map(c => `
+      <div class="item">
+        <div style="min-width:60px"><b>${c.start}</b><br><small class="muted">${c.end}</small></div>
+        <div class="item-body">
+          <div class="item-title">${c.subject}</div>
+          <div class="item-sub"><span class="tag ${c.type}">${c.type}</span><span>${c.place||''}</span></div>
+        </div>
+        <button class="del" onclick="delClass('${c.id}')">✕</button>
+      </div>
+    `).join('') : '<div class="empty">No classes for this day.</div>';
+  }
+
+  function renderTasks() {
+    document.getElementById('taskList').innerHTML = data.tasks.map(t => `
+      <div class="item ${t.done?'done':''}">
+        <div class="check ${t.done?'on':''}" onclick="toggleTask('${t.id}')"></div>
+        <div class="item-body">
+          <div class="item-title">${t.title}</div>
+          <div class="item-sub"><span class="tag ${t.priority}">${t.priority}</span><span>${t.subject||''}</span><span>${t.due}</span></div>
+        </div>
+        <button class="del" onclick="delTask('${t.id}')">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function renderExams() {
+    document.getElementById('examList').innerHTML = data.exams.map(e => `
+      <div class="item">
+        <div class="exam-count"><b>${e.date.split('-')[2]}</b><span>${e.date.split('-')[1]}</span></div>
+        <div class="item-body">
+          <div class="item-title">${e.subject}</div>
+          <div class="item-sub"><span class="tag ${e.type}">${e.type}</span><span>${e.time}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderNotes() {
+    document.getElementById('notesGrid').innerHTML = `
+      <div class="note add" onclick="addNote()"><span>+</span> New Note</div>
+      ` + data.notes.map(n => `
+      <div class="note">
+        <h3>${n.title}</h3>
+        <p>${n.body}</p>
+      </div>
+    `).join('');
+  }
+
+  window.toggleTask = (id) => {
+    const t = data.tasks.find(x => x.id === id);
+    if (t) { t.done = !t.done; save(); renderToday(); renderTasks(); toast(t.done ? 'Task marked complete! 🎯' : 'Task pending'); }
+  };
+  window.delClass = (id) => { data.classes = data.classes.filter(x => x.id !== id); save(); renderTimetable(); renderToday(); };
+  window.delTask = (id) => { data.tasks = data.tasks.filter(x => x.id !== id); save(); renderTasks(); renderToday(); };
+  window.addNote = () => {
+    const title = prompt('Note title:');
+    if (!title) return;
+    const body = prompt('Note text:');
+    data.notes.push({ id: String(Date.now()), title, body: body || '' });
+    save(); renderNotes(); toast('Note saved!');
+  };
+
+  // Forms
+  document.getElementById('toggleClassForm').onclick = () => document.getElementById('classForm').classList.toggle('hidden');
+  document.getElementById('cancelClassForm').onclick = () => document.getElementById('classForm').classList.add('hidden');
+  document.getElementById('classForm').onsubmit = (e) => {
+    e.preventDefault();
+    const s = document.getElementById('cSubject').value.trim();
+    if (!s) return;
+    data.classes.push({
+      id: String(Date.now()),
+      day: curDay,
+      subject: s,
+      start: document.getElementById('cStart').value,
+      end: document.getElementById('cEnd').value,
+      type: document.getElementById('cType').value,
+      place: document.getElementById('cPlace').value.trim()
+    });
+    save(); renderTimetable(); renderToday();
+    document.getElementById('classForm').reset();
+    document.getElementById('classForm').classList.add('hidden');
+    toast('Class added ✓');
+  };
+
+  document.getElementById('toggleTaskForm').onclick = () => document.getElementById('taskForm').classList.toggle('hidden');
+  document.getElementById('cancelTaskForm').onclick = () => document.getElementById('taskForm').classList.add('hidden');
+  document.getElementById('taskForm').onsubmit = (e) => {
+    e.preventDefault();
+    const t = document.getElementById('tTitle').value.trim();
+    if (!t) return;
+    data.tasks.push({
+      id: String(Date.now()),
+      title: t,
+      subject: document.getElementById('tSubject').value.trim(),
+      due: document.getElementById('tDue').value || new Date().toISOString().split('T')[0],
+      priority: document.getElementById('tPriority').value,
+      done: false
+    });
+    save(); renderTasks(); renderToday();
+    document.getElementById('taskForm').reset();
+    document.getElementById('taskForm').classList.add('hidden');
+    toast('Homework added ✓');
+  };
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById('view-' + b.dataset.tab).classList.remove('hidden');
+      if (b.dataset.tab === 'today') renderToday();
+      if (b.dataset.tab === 'timetable') renderTimetable();
+      if (b.dataset.tab === 'tasks') renderTasks();
+      if (b.dataset.tab === 'exams') renderExams();
+      if (b.dataset.tab === 'notes') renderNotes();
+    };
+  });
+
+  // Focus Timer
+  let tLeft = 25 * 60;
+  let timerInterval = null;
+  const tRing = document.getElementById('timerRing');
+  const CIRC = 2 * Math.PI * 88;
+  tRing.setAttribute('stroke-dasharray', CIRC);
+
+  function drawTimer() {
+    const m = String(Math.floor(tLeft / 60)).padStart(2, '0');
+    const s = String(tLeft % 60).padStart(2, '0');
+    document.getElementById('timerTime').textContent = `${m}:${s}`;
+    tRing.setAttribute('stroke-dashoffset', CIRC * (1 - tLeft / (25 * 60)));
+  }
+
+  document.getElementById('timerStart').onclick = function() {
+    if (timerInterval) {
+      clearInterval(timerInterval); timerInterval = null;
+      this.textContent = 'Start';
+    } else {
+      this.textContent = 'Pause';
+      timerInterval = setInterval(() => {
+        tLeft--;
+        drawTimer();
+        if (tLeft <= 0) {
+          clearInterval(timerInterval); timerInterval = null;
+          toast('Focus session completed! 🏆');
+          document.getElementById('timerStart').textContent = 'Start';
+          tLeft = 25 * 60; drawTimer();
+        }
+      }, 1000);
+    }
+  };
+  document.getElementById('timerReset').onclick = () => {
+    clearInterval(timerInterval); timerInterval = null;
+    document.getElementById('timerStart').textContent = 'Start';
+    tLeft = 25 * 60; drawTimer();
+  };
+
+  // Theme & Lang
+  document.getElementById('themeBtn').onclick = () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'dark');
+    toast(isDark ? 'Light theme activated ☀️' : 'Dark theme activated 🖤');
+  };
+
+  document.getElementById('topDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  renderToday();
+})();
+</script>
+</body>
+</html>
