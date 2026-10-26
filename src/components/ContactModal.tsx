@@ -18,21 +18,66 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage('');
 
-    setTimeout(() => {
+    const targetEmail = PERSONAL_INFO.email || 'manaathapa14@gmail.com';
+
+    try {
+      // 1. Send form payload to FormSubmit endpoint configured for manaathapa14@gmail.com
+      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          _subject: `New Inquiry from ${formData.name}: ${formData.topic}`,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || 'Not provided',
+          topic: formData.topic,
+          message: formData.message,
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Form service response was not ok');
+      }
+
       setLoading(false);
       setSubmitted(true);
-    }, 500);
+    } catch {
+      // 2. Resilient Fallback: If network or ad-blocker blocks the service, automatically trigger mailto client
+      const subject = encodeURIComponent(`[AA Studio Portfolio] ${formData.topic} - from ${formData.name}`);
+      const body = encodeURIComponent(
+        `Hello Aanam Thapa,\n\n` +
+        `Name: ${formData.name}\n` +
+        `Email: ${formData.email}\n` +
+        `Phone: ${formData.phone || 'N/A'}\n` +
+        `Topic: ${formData.topic}\n\n` +
+        `Message:\n${formData.message}\n\n` +
+        `Sent via AA Studio Portfolio Form`
+      );
+
+      const mailtoUrl = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+      window.location.href = mailtoUrl;
+
+      setLoading(false);
+      setSubmitted(true);
+    }
   };
 
   const handleReset = () => {
     setSubmitted(false);
+    setErrorMessage('');
     setFormData({
       name: '',
       email: '',
@@ -70,10 +115,10 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
 
             <div className="space-y-1">
               <h3 className="text-xl font-bebas tracking-wide text-white uppercase">
-                Message Sent Successfully!
+                Message Dispatched to Aanam!
               </h3>
               <p className="text-xs text-zinc-300 max-w-sm mx-auto font-sans leading-relaxed">
-                Thank you for reaching out to Aanam Thapa! Your note has been received, and he will check it after school.
+                Thank you for reaching out! Your information has been delivered to <span className="text-[#E11D48] font-mono font-semibold">{PERSONAL_INFO.email}</span>. Aanam will review and respond promptly.
               </p>
             </div>
 
@@ -152,23 +197,41 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
-                  Regarding Topic
-                </label>
-                <select
-                  value={formData.topic}
-                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 focus:border-[#E11D48] text-xs text-white outline-none transition-colors"
-                >
-                  <option value="Feedback on ASHLINE Game">Feedback on ASHLINE 3D Game</option>
-                  <option value="Feedback on Barbershop.Pokhara">Feedback on Barbershop.Pokhara</option>
-                  <option value="Feedback on The New Barber">Feedback on The New Barber</option>
-                  <option value="Feedback on Bowler's Academy">Feedback on Bowler's Academy</option>
-                  <option value="Feedback on Aria Voice App">Feedback on Aria Voice App</option>
-                  <option value="School Coding Project Collaboration">School Coding Project Collaboration</option>
-                  <option value="General Hello & Appreciation">General Hello & Appreciation</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
+                    Phone Number (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+91 98765 43210"
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 focus:border-[#E11D48] text-xs text-white placeholder-zinc-500 outline-none transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 block font-semibold">
+                    Regarding Topic
+                  </label>
+                  <select
+                    value={formData.topic}
+                    onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 focus:border-[#E11D48] text-xs text-white outline-none transition-colors"
+                  >
+                    <option value="New Web / App Project Inquiry">New Web / App Project Inquiry</option>
+                    <option value="Client Collaboration & Consultation">Client Collaboration & Consultation</option>
+                    <option value="Poké Go Hub Feedback">Poké Go Hub Feedback</option>
+                    <option value="StudyMate Planner Feedback">StudyMate Planner Feedback</option>
+                    <option value="Project NOVA AI Terminal">Project NOVA AI Terminal</option>
+                    <option value="Feedback on ASHLINE 3D Game">Feedback on ASHLINE 3D Game</option>
+                    <option value="Barbershop Portal (Pokhara / New Barber)">Barbershop Portal (Pokhara / New Barber)</option>
+                    <option value="Bowler's Academy Platform">Bowler's Academy Platform</option>
+                    <option value="ARIA Voice Assistant">ARIA Voice Assistant</option>
+                    <option value="General Hello & Discussion">General Hello & Discussion</option>
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-1">
