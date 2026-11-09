@@ -221,6 +221,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                     className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 focus:border-[#E11D48] text-xs text-white outline-none transition-colors"
                   >
                     <option value="New Web / App Project Inquiry">New Web / App Project Inquiry</option>
+                    <option value="NexoraDev Digital Solutions / Client Work">NexoraDev Digital Solutions / Client Work</option>
                     <option value="Client Collaboration & Consultation">Client Collaboration & Consultation</option>
                     <option value="Poké Go Hub Feedback">Poké Go Hub Feedback</option>
                     <option value="StudyMate Planner Feedback">StudyMate Planner Feedback</option>

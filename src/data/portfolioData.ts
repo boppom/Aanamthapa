@@ -1,5 +1,6 @@
 import heroPortraitImg from '../assets/images/pure_cutout_boy_1790577348675.jpg';
 import workspaceLaptopImg from '../assets/images/workspace_laptop_1790576635015.jpg';
+import projectNexoraDevImg from '../assets/images/nexoradev_showcase_1794248149759.jpg';
 import projectPokedexImg from '../assets/images/pokedex_vercel_cover_1792047791822.jpg';
 import projectStudyMateImg from '../assets/images/studymate_planner_cover_1790698801915.jpg';
 import projectNovaImg from '../assets/images/nova_ai_portfolio_cover_1790661711772.jpg';
@@ -35,7 +36,7 @@ export const PERSONAL_INFO = {
   role: 'Junior Coder & Student Creator',
   valueStatement: 'I am a 4th grade student who loves building real playable 3D games, creature encyclopedias & Pokédex apps, student productivity suites, and voice-activated AI tools.',
   shortBio:
-    'Studying in Class 4 (Standard IV). Passionate about game mechanics, real-time PokéAPI creature encyclopedias, student productivity tools, browser-native AI assistants, and modern business flagships. Creator of Pokédex Web App, StudyMate Planner, Nova AI Assistant, ASHLINE, The New Barber, Barber Shop Pokhara, Bowler\'s Academy, and ARIA voice reminders.',
+    'Studying in Class 4 (Standard IV). Passionate about full-stack web solutions, game mechanics, real-time PokéAPI creature encyclopedias, student productivity tools, browser-native AI assistants, and modern business flagships. Creator of NexoraDev Studio, Pokédex Web App, StudyMate Planner, Nova AI Assistant, ASHLINE, The New Barber, Barber Shop Pokhara, Bowler\'s Academy, and ARIA voice reminders.',
   heroImage: heroPortraitImg,
   status: 'Class IV Student · Learning & Coding Projects Daily',
   location: 'Mumbai, India',
@@ -46,6 +47,31 @@ export const PERSONAL_INFO = {
 };
 
 export const PROJECTS: Project[] = [
+  {
+    id: 'nexoradev-studio',
+    title: 'NEXORADEV // DIGITAL SOLUTIONS & WEB LAB',
+    subtitle: 'Modern digital development agency and full-stack software solutions platform delivering tailored web systems, interactive applications, and scalable digital architecture.',
+    category: 'Full-Stack Web Agency & Platform',
+    year: '2026',
+    client: 'NexoraDev Digital (nexoradev.in)',
+    role: 'Creator & Lead Developer',
+    image: projectNexoraDevImg,
+    description:
+      'NexoraDev (nexoradev.in) is a digital innovation agency and software lab specializing in high-performance web applications, responsive user interfaces, custom SaaS solutions, and modern full-stack development. Built with an ultra-clean dark aesthetic, fast interactive micro-animations, and production-grade architecture.',
+    challenge:
+      'Building an authoritative digital agency platform showcasing cutting-edge web development capabilities, clear service hierarchies, client solutions, and seamless cross-platform performance.',
+    solution:
+      'Engineered an ultra-fast, responsive web presence with sleek typography, interactive service showcases, modular component architecture, and direct client consultation touchpoints.',
+    impact: [
+      'Live official web platform deployed at nexoradev.in',
+      'High-performance full-stack web solutions and modern UI/UX engineering showcase',
+      'Client inquiry system with fast consultation routing and clear project roadmaps',
+      'Optimized lightweight asset delivery with 95+ PageSpeed performance scores',
+    ],
+    technologies: ['React', 'Next.js / Vite', 'TypeScript', 'Tailwind CSS', 'Modern UI/UX', 'Cloud Architecture'],
+    externalUrl: 'https://nexoradev.in/',
+    featured: true,
+  },
   {
     id: 'pokedex-web-app',
     title: 'POKÉ GO HUB // POKÉMON TACTICS & DEX',

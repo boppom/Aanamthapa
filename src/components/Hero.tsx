@@ -217,7 +217,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenContact, theme = 'dark' }) => 
                   <div className={`font-bebas text-4xl sm:text-5xl tracking-wide leading-none flex items-baseline gap-1 ${
                     isDark ? 'text-white' : 'text-gray-900'
                   }`}>
-                    <span className="text-[#E11D48]">8</span>
+                    <span className="text-[#E11D48]">9</span>
                     <span>+</span>
                   </div>
                   <div className={`text-[10px] font-mono tracking-widest uppercase font-semibold ${

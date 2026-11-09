@@ -99,7 +99,9 @@ export const Projects: React.FC<ProjectsProps> = ({ onOpenContact, theme = 'dark
                     <div className="space-y-3.5">
                       <div>
                         <div className="text-[11px] font-mono text-[#E11D48] font-bold tracking-wider uppercase mb-1">
-                          {project.id === 'pokedex-web-app'
+                          {project.id === 'nexoradev-studio'
+                            ? 'LIVE DIGITAL PLATFORM · NEXORADEV.IN'
+                            : project.id === 'pokedex-web-app'
                             ? 'LIVE POKÉ GO HUB · NETLIFY DEPLOYMENT'
                             : project.id === 'studymate-school-planner'
                             ? 'BILINGUAL STUDENT PLANNER & FOCUS TIMER'
@@ -180,7 +182,9 @@ export const Projects: React.FC<ProjectsProps> = ({ onOpenContact, theme = 'dark
                         >
                           <Play className="w-3.5 h-3.5 fill-white" />
                           <span>
-                            {project.id === 'pokedex-web-app'
+                            {project.id === 'nexoradev-studio'
+                              ? 'Visit NexoraDev Live'
+                              : project.id === 'pokedex-web-app'
                               ? 'Launch Poké Go Hub'
                               : project.id === 'studymate-school-planner'
                               ? 'Launch StudyMate'
